@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Car Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            grid-gap: 10px;
+            padding: 10px;
+        }
+        .grid-container button {
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+        .grid-container button:hover {
+            background-color: #45a049;
+        }
+        .slider-container {
+            margin-top: 20px;
+        }
+        .slider {
+            width: 100%;
+            max-width: 500px;
+        }
+        .speed-value {
+            font-size: 18px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>ESP32 Car Control</h1>
+
+    <div class="grid-container">
+        <!-- Directional Buttons -->
+        <button onclick="sendCommand('forward', getSpeed())">Forward</button>
+        <button onclick="sendCommand('left', getSpeed())">Left</button>
+        <button onclick="sendCommand('right', getSpeed())">Right</button>
+
+        <button onclick="sendCommand('backward', getSpeed())">Backward</button>
+        <button onclick="sendCommand('stop', 0)">Stop</button>
+        <button></button>
+
+        <button onclick="sendCommand('backward', getSpeed())">Backward</button>
+        <button onclick="sendCommand('left', getSpeed())">Left</button>
+        <button onclick="sendCommand('right', getSpeed())">Right</button>
+    </div>
+
+    <div class="slider-container">
+        <label for="speedSlider">Speed: <span class="speed-value" id="speedValue">0</span></label>
+        <input type="range" id="speedSlider" class="slider" min="0" max="255" value="0" onchange="updateSpeed()">
+    </div>
+
+    <script>
+        // Get the speed from the slider
+        function getSpeed() {
+            var speed = document.getElementById("speedSlider").value;
+            return speed;
+        }
+
+        // Update the displayed speed value when the slider is moved
+        function updateSpeed() {
+            var speed = getSpeed();
+            document.getElementById("speedValue").textContent = speed;
+        }
+
+        // Send the command and speed to the Flask server via AJAX
+        function sendCommand(command, speed) {
+            $.ajax({
+                url: "/control",
+                type: "GET",
+                data: {cmd: command, speed: speed},
+                success: function(response) {
+                    console.log("Command sent:", command, "Speed:", speed);
+                    // Do not display any message to the user
+                },
+                error: function(xhr, status, error) {
+                    alert("Error: " + error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
